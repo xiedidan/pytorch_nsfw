@@ -39,6 +39,8 @@ def do_inference(context, h_input, d_input, h_output, d_output, stream):
 def build_engine_caffe(model_file, deploy_file):
     with trt.Builder(TRT_LOGGER) as builder, builder.create_network() as network, builder.create_builder_config() as config, trt.CaffeParser() as parser:
         config.max_workspace_size = 1 << 30 # 1 GiB
+        config.set_flag(trt.BuilderFlag.FP16)
+        config.set_flag(trt.BuilderFlag.STRICT_TYPES)
         
         model_tensors = parser.parse(deploy=deploy_file, model=model_file, network=network, dtype=ModelData.DTYPE)
         network.mark_output(model_tensors.find(ModelData.OUTPUT_NAME))
